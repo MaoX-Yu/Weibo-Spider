@@ -1,0 +1,20 @@
+{
+  "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.53",
+      "cookie": ""
+    },
+  "user_num": 20,
+  "blog_num": 10,
+  "sleep_time": {
+    "min": 3,
+    "max": 7
+  },
+  "mysql": {
+    "host": "127.0.0.1",
+    "user": "root",
+    "password": "",
+    "port": 3306,
+    "db_name": "weibo",
+    "charset": "utf8mb4"
+  }
+}

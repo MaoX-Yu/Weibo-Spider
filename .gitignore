@@ -1,0 +1,6 @@
+images
+temp
+.idea
+__pycache__
+config.json
+uid.csv
