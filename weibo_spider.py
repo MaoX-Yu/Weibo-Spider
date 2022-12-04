@@ -14,6 +14,7 @@ from logging import handlers
 import pandas
 import pymysql
 import requests
+from requests.adapters import HTTPAdapter
 from tqdm import tqdm
 
 from utils import (
@@ -35,6 +36,10 @@ class WeiboSpider:
         check_dir('temp')
         self.logger = logging.getLogger()
         self.set_logger()
+
+        self.session = requests.Session()
+        self.session.mount('http://', HTTPAdapter(max_retries=3))
+        self.session.mount('https://', HTTPAdapter(max_retries=3))
 
         with open('uid.csv', 'w', encoding='utf-8') as f:  # 清空uid.csv文件
             f.write('')
@@ -120,7 +125,7 @@ class WeiboSpider:
             r'''<head>.*?<script type="text/javascript">.*?CONFIG\['s_search'] = '(?P<search>.*?)'.*?</script>.*?</head>''',
             re.S)
 
-        resp = requests.get(url, params=params, headers=self.headers)
+        resp = self.session.get(url, params=params, headers=self.headers, timeout=(5, 10))
         resp.encoding = "utf-8"
         result = re_comp.findall(resp.text)
         url_real = str.format("{0}/weibo?q={1}", url, result.pop())
@@ -133,7 +138,7 @@ class WeiboSpider:
         :param url: 网址
         :return: html
         """
-        resp = requests.get(url, headers=self.headers)
+        resp = self.session.get(url, headers=self.headers, timeout=(5, 10))
         resp.encoding = "utf-8"
         result = resp.text
         resp.close()
@@ -153,7 +158,7 @@ class WeiboSpider:
             'uid': uid
         }
 
-        resp = requests.get(url_info, headers=self.headers, params=params)
+        resp = self.session.get(url_info, headers=self.headers, params=params, timeout=(5, 10))
         resp.encoding = 'utf-8'
         info = resp.json()['data']['user']
         resp.close()
@@ -168,7 +173,7 @@ class WeiboSpider:
             else:
                 details.append('')
 
-        resp = requests.get(url, headers=self.headers, params=params)
+        resp = self.session.get(url, headers=self.headers, params=params, timeout=(5, 10))
         resp.encoding = "utf-8"
         data = resp.json()['data']
         resp.close()
@@ -222,7 +227,7 @@ class WeiboSpider:
                             'since_id': since_id
                         }
 
-                    resp = requests.get(url, headers=self.headers, params=params)
+                    resp = self.session.get(url, headers=self.headers, params=params, timeout=(5, 10))
                     resp.encoding = 'utf-8'
                     data = resp.json()['data']
                     blog_list = data['list']
@@ -291,7 +296,7 @@ class WeiboSpider:
             "id": blog_id
         }
 
-        resp = requests.get(url, headers=self.headers, params=params)
+        resp = self.session.get(url, headers=self.headers, params=params, timeout=(5, 10))
         result = resp.json()['data']['longTextContent']
         resp.close()
         return result
@@ -358,7 +363,7 @@ class WeiboSpider:
             'pid': pic_id
         }
 
-        resp = requests.get(url, params=params, headers=self.headers)
+        resp = self.session.get(url, params=params, headers=self.headers, timeout=(5, 10))
         with open('images/' + str(pic_id) + '.jpg', 'wb') as f:
             f.write(resp.content)
         resp.close()
