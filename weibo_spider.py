@@ -68,7 +68,13 @@ class WeiboSpider:
 
         formatter = logging.Formatter('%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
-        file_handler = handlers.TimedRotatingFileHandler(filename='temp/weibo_spider.log', when='D', encoding='utf-8')
+        file_handler = handlers.TimedRotatingFileHandler(
+            filename='temp/weibo_spider.log',
+            when='midnight',
+            interval=1,
+            backupCount=30,
+            encoding='utf-8'
+        )
         file_handler.setLevel(level=logging.INFO)
         file_handler.setFormatter(formatter)
 
