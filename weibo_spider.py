@@ -218,8 +218,9 @@ class WeiboSpider:
 
                     resp = requests.get(url, headers=self.headers, params=params)
                     resp.encoding = 'utf-8'
-                    since_id = resp.json()['data']['since_id']
-                    blog_list = resp.json()['data']['list']
+                    data = resp.json()['data']
+                    blog_list = data['list']
+                    since_id = data['since_id'] if 'since_id' in data else ''
                     resp.close()
 
                     for i in range(len(blog_list)):
