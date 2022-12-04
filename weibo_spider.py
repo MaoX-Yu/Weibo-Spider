@@ -2,7 +2,7 @@
 # @Author: MaoX-Yu
 # @Time: 2022/9/28 16:32
 # @Desc: 微博爬虫
-# @Update: 2022/12/3 20:15
+# @Update: 2022/12/4 11:15
 import re
 import json
 import random
@@ -255,9 +255,12 @@ class WeiboSpider:
                         blog_msg.append(str(uid))
                         self.db_insert('blog', blog_msg)
 
-                        for pic in pic_list:
+                        for index, pic in enumerate(pic_list):
                             if self.db_insert('picture', [pic, blog_list[i]['idstr']]):
                                 self.download_pic(pic)
+
+                            if (index+1) % 3 == 0:
+                                self.sleep_time()
 
                         blog_msg = []
                         pic_list = []
