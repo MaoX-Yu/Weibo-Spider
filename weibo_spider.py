@@ -238,11 +238,11 @@ class WeiboSpider:
                         if blog_count >= count:
                             return
                         elif 'retweeted_status' in blog_list[i]:
-                            break
+                            continue
                         elif 'page_info' in blog_list[i]:
-                            break
+                            continue
                         elif 'title' in blog_list[i] and '赞过的微博' in blog_list[i]['title']['text']:
-                            break
+                            continue
                         elif blog_list[i]['isLongText']:
                             try:
                                 long_text = self.get_long_blog(blog_list[i]['mblogid'])
