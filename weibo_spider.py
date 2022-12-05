@@ -125,7 +125,7 @@ class WeiboSpider:
             r'''<head>.*?<script type="text/javascript">.*?CONFIG\['s_search'] = '(?P<search>.*?)'.*?</script>.*?</head>''',
             re.S)
 
-        resp = self.session.get(url, params=params, headers=self.headers, timeout=(5, 10))
+        resp = self.session.get(url, params=params, headers=self.headers, timeout=5)
         resp.encoding = "utf-8"
         result = re_comp.findall(resp.text)
         url_real = str.format("{0}/weibo?q={1}", url, result.pop())
@@ -138,7 +138,7 @@ class WeiboSpider:
         :param url: 网址
         :return: html
         """
-        resp = self.session.get(url, headers=self.headers, timeout=(5, 10))
+        resp = self.session.get(url, headers=self.headers, timeout=5)
         resp.encoding = "utf-8"
         result = resp.text
         resp.close()
@@ -158,7 +158,7 @@ class WeiboSpider:
             'uid': uid
         }
 
-        resp = self.session.get(url_info, headers=self.headers, params=params, timeout=(5, 10))
+        resp = self.session.get(url_info, headers=self.headers, params=params, timeout=5)
         resp.encoding = 'utf-8'
         info = resp.json()['data']['user']
         resp.close()
@@ -173,7 +173,7 @@ class WeiboSpider:
             else:
                 details.append('')
 
-        resp = self.session.get(url, headers=self.headers, params=params, timeout=(5, 10))
+        resp = self.session.get(url, headers=self.headers, params=params, timeout=5)
         resp.encoding = "utf-8"
         data = resp.json()['data']
         resp.close()
@@ -227,7 +227,7 @@ class WeiboSpider:
                             'since_id': since_id
                         }
 
-                    resp = self.session.get(url, headers=self.headers, params=params, timeout=(5, 10))
+                    resp = self.session.get(url, headers=self.headers, params=params, timeout=5)
                     resp.encoding = 'utf-8'
                     data = resp.json()['data']
                     blog_list = data['list']
@@ -296,7 +296,7 @@ class WeiboSpider:
             "id": blog_id
         }
 
-        resp = self.session.get(url, headers=self.headers, params=params, timeout=(5, 10))
+        resp = self.session.get(url, headers=self.headers, params=params, timeout=5)
         result = resp.json()['data']['longTextContent']
         resp.close()
         return result
@@ -363,7 +363,7 @@ class WeiboSpider:
             'pid': pic_id
         }
 
-        resp = self.session.get(url, params=params, headers=self.headers, timeout=(5, 10))
+        resp = self.session.get(url, params=params, headers=self.headers, timeout=5)
         with open('images/' + str(pic_id) + '.jpg', 'wb') as f:
             f.write(resp.content)
         resp.close()
