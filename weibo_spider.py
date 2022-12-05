@@ -165,10 +165,14 @@ class WeiboSpider:
             'uid': uid
         }
 
-        resp = self.session.get(url_info, headers=self.headers, params=params, timeout=5)
-        resp.encoding = 'utf-8'
-        info = resp.json()['data']['user']
-        resp.close()
+        try:
+            resp = self.session.get(url_info, headers=self.headers, params=params, timeout=5)
+            resp.encoding = 'utf-8'
+            info = resp.json()['data']['user']
+            resp.close()
+        except Exception:
+            self.logger.error(traceback.format_exc(limit=1))
+            return
 
         if info['verified'] and 0 < info['verified_type'] < 200:  # 判断是否为官方号
             self.logger.info('用户ID:{0} 用户名:{1} 不符合条件'.format(uid, uname))
@@ -370,10 +374,13 @@ class WeiboSpider:
             'pid': pic_id
         }
 
-        resp = self.session.get(url, params=params, headers=self.headers, timeout=5)
-        with open('images/' + str(pic_id) + '.jpg', 'wb') as f:
-            f.write(resp.content)
-        resp.close()
+        try:
+            resp = self.session.get(url, params=params, headers=self.headers, timeout=5)
+            with open('images/' + str(pic_id) + '.jpg', 'wb') as f:
+                f.write(resp.content)
+            resp.close()
+        except Exception:
+            self.logger.warning('pid:{0}图片下载失败'.format(pic_id))
 
     def run(self):
         try:
