@@ -2,7 +2,7 @@
 # @Author: MaoX-Yu
 # @Time: 2022/9/28 16:32
 # @Desc: 微博爬虫
-# @Update: 2022/12/4 11:15
+# @Update: 2022/12/5 10:50
 import re
 import json
 import random
@@ -33,19 +33,24 @@ class WeiboSpider:
         self.config = None
 
         check_dir('images')
+
+        # 配置logger
         check_dir('temp')
         self.logger = logging.getLogger()
         self.set_logger()
 
+        # 配置session
         self.session = requests.Session()
         self.session.mount('http://', HTTPAdapter(max_retries=3))
         self.session.mount('https://', HTTPAdapter(max_retries=3))
 
-        with open('uid.csv', 'w', encoding='utf-8') as f:  # 清空uid.csv文件
+        # 清空uid.csv文件
+        with open('uid.csv', 'w', encoding='utf-8') as f:
             f.write('')
 
+        # 获取配置
         try:
-            with open("config.json", mode="r", encoding="utf-8") as f:  # 获取配置
+            with open("config.json", mode="r", encoding="utf-8") as f:
                 self.config = json.load(f)
         except FileNotFoundError:
             self.logger.error('config.json文件未找到')
@@ -61,8 +66,10 @@ class WeiboSpider:
             self.logger.error('配置文件有误，错误信息：{0}'.format(traceback.format_exc(limit=1)))
             exit(1)
 
+        # 获取数据库连接
         self.connect_db()
 
+        # 检查cookie
         if 'cookie' not in self.headers or self.headers['cookie'] == '' or len(self.headers['cookie']) == 0:
             self.logger.error("请先在config.json中配置cookie")
             exit(1)
@@ -198,7 +205,7 @@ class WeiboSpider:
 
         :param uid: 用户uid
         :param count: 博文数量
-        :return:
+        :return: 无返回值
         """
         page = 1
         blog_count = 0
@@ -288,8 +295,8 @@ class WeiboSpider:
     def get_long_blog(self, blog_id):
         """ 返回长微博的博文
 
-        :param blog_id:
-        :return:
+        :param blog_id: 博文id
+        :return: 博文内容
         """
         url = 'https://weibo.com/ajax/statuses/longtext'
         params = {
