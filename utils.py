@@ -81,3 +81,9 @@ def standardize_date(created_at):
     """
     result = datetime.strptime(created_at, "%a %b %d %H:%M:%S +0800 %Y")
     return result
+
+
+def init_uid_csv():
+    """ 清空uid.csv文件 """
+    with open('uid.csv', 'w', encoding='utf-8') as f:
+        f.write('')
