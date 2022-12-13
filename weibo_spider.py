@@ -22,7 +22,8 @@ from utils import (
     rm_html,
     insert_sql,
     standardize_date,
-    next_page
+    next_page,
+    init_uid_csv
 )
 
 
@@ -43,10 +44,6 @@ class WeiboSpider:
         self.session = requests.Session()
         self.session.mount('http://', HTTPAdapter(max_retries=3))
         self.session.mount('https://', HTTPAdapter(max_retries=3))
-
-        # 清空uid.csv文件
-        with open('uid.csv', 'w', encoding='utf-8') as f:
-            f.write('')
 
         # 获取配置
         try:
@@ -282,7 +279,7 @@ class WeiboSpider:
                             if self.db_insert('picture', [pic, blog_list[i]['idstr']]):
                                 self.download_pic(pic)
 
-                            if (index+1) % 3 == 0:
+                            if (index + 1) % 3 == 0:
                                 self.sleep_time()
 
                         blog_msg = []
@@ -382,11 +379,56 @@ class WeiboSpider:
         except Exception:
             self.logger.warning('pid:{0}图片下载失败'.format(pic_id))
 
+    def continue_last(self):
+        """ 继续上次爬取
+
+        :return: bool
+        """
+        try:
+            id_df = pandas.read_csv('uid.csv', names=['uid', 'username'])
+        except Exception:
+            self.logger.error(traceback.format_exc())
+            return False
+
+        for i in range(id_df.shape[0]):
+            if self.select_uid_in_blog(id_df.iloc[i]['uid']):
+                continue
+
+            self.get_blogs(id_df.iloc[i]['uid'], self.blog_num)
+
+            if (i + 1) % 5 == 0:
+                self.sleep_time()
+
+        return True
+
+    def select_uid_in_blog(self, value):
+        """ 查找用户是否在blog表中有记录
+
+        :param value: uid
+        :return: bool
+        """
+        sql = """SELECT * FROM blog WHERE u_id='{0}'"""
+        cur = self.db.cursor()
+        cur.execute(sql.format(value))
+        if cur.rowcount > 0:
+            return True
+        else:
+            return False
+
     def run(self):
         try:
             print("微博爬虫")
             print("config.json为配置文件")
             print("------------------------")
+            key = input("是否继续上一次的爬取？(y/N):")
+            if key.upper() == 'Y':
+                if self.continue_last():
+                    return
+                else:
+                    print("继续上次爬取失败，请重新开始爬取")
+                    init_uid_csv()
+            else:
+                init_uid_csv()
             search_key = input("请输入话题关键词：")
             url_real = self.get_real_url(search_key)
 
