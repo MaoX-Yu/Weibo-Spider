@@ -391,7 +391,9 @@ class WeiboSpider:
             return False
 
         for i in range(id_df.shape[0]):
-            if self.select_uid_in_blog(id_df.iloc[i]['uid']):
+            if self.select_uid('blog', id_df.iloc[i]['uid']):
+                continue
+            elif not self.select_uid('user', id_df.iloc[i]['uid']):
                 continue
 
             self.get_blogs(id_df.iloc[i]['uid'], self.blog_num)
@@ -401,15 +403,16 @@ class WeiboSpider:
 
         return True
 
-    def select_uid_in_blog(self, value):
+    def select_uid(self, table, value):
         """ 查找用户是否在blog表中有记录
 
+        :param table: 表名
         :param value: uid
         :return: bool
         """
-        sql = """SELECT * FROM blog WHERE u_id='{0}'"""
+        sql = """SELECT * FROM {0} WHERE u_id='{1}'"""
         cur = self.db.cursor()
-        cur.execute(sql.format(value))
+        cur.execute(sql.format(table, value))
         if cur.rowcount > 0:
             return True
         else:
