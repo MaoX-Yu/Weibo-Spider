@@ -215,6 +215,7 @@ class WeiboSpider:
         blog_msg = []
         blog_key = ['idstr', 'text', 'attitudes_count', 'pic_ids', 'created_at']  # 博文id，博文内容，点赞，图片id
         is_long_text = False
+        is_retweeted = False
         long_text = ''
         url = 'https://weibo.com/ajax/statuses/mymblog'
 
@@ -245,12 +246,12 @@ class WeiboSpider:
                     for i in range(len(blog_list)):
                         if blog_count >= count:
                             return
-                        elif 'retweeted_status' in blog_list[i]:
-                            continue
                         elif 'page_info' in blog_list[i]:
                             continue
                         elif 'title' in blog_list[i] and '赞过的微博' in blog_list[i]['title']['text']:
                             continue
+                        elif 'retweeted_status' in blog_list[i]:
+                            is_retweeted = True
                         elif blog_list[i]['isLongText']:
                             try:
                                 long_text = self.get_long_blog(blog_list[i]['mblogid'])
@@ -273,6 +274,11 @@ class WeiboSpider:
                                     blog_msg.append(blog_list[i][key])
 
                         blog_msg.append(str(uid))
+                        # 是否转发 是为1，否为0
+                        if is_retweeted:
+                            blog_msg.append(1)
+                        else:
+                            blog_msg.append(0)
                         self.db_insert('blog', blog_msg)
 
                         for index, pic in enumerate(pic_list):
@@ -286,6 +292,7 @@ class WeiboSpider:
                         pic_list = []
                         blog_count += 1
                         is_long_text = False
+                        is_retweeted = False
                         bar.update(1)
 
                     page += 1
