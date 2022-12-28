@@ -392,8 +392,10 @@ class WeiboSpider:
 
         for i in range(id_df.shape[0]):
             if self.select_uid('blog', id_df.iloc[i]['uid']):
+                self.logger.info('skip,uid:{0}'.format(id_df.iloc[i]['uid']))
                 continue
             elif not self.select_uid('user', id_df.iloc[i]['uid']):
+                self.logger.info('skip,uid:{0}'.format(id_df.iloc[i]['uid']))
                 continue
 
             self.get_blogs(id_df.iloc[i]['uid'], self.blog_num)
