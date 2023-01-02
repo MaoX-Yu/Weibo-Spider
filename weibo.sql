@@ -46,6 +46,7 @@ CREATE TABLE `blog` (
   `b_attitudes` int DEFAULT NULL,
   `b_time` datetime DEFAULT NULL,
   `u_id` varchar(20) CHARACTER SET utf8 NOT NULL,
+  `is_forward` int NOT NULL DEFAULT '0' COMMENT '是否转发，否为0，是为1',
   PRIMARY KEY (`b_id`),
   KEY `blog_FK` (`u_id`),
   CONSTRAINT `blog_FK` FOREIGN KEY (`u_id`) REFERENCES `user` (`u_id`)
@@ -81,4 +82,4 @@ CREATE TABLE `picture` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-22 18:40:28
+-- Dump completed on 2023-01-02 21:43:53
