@@ -2,7 +2,7 @@
 # @Author: MaoX-Yu
 # @Time: 2022/9/28 16:32
 # @Desc: 微博爬虫
-# @Update: 2022/12/5 10:50
+# @Update: 2023/1/5 23:30
 import re
 import json
 import random
@@ -413,7 +413,7 @@ class WeiboSpider:
         return True
 
     def select_uid(self, table, value):
-        """ 查找用户是否在blog表中有记录
+        """ 查找用户是否在表中有记录
 
         :param table: 表名
         :param value: uid
