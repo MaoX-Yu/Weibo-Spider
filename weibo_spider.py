@@ -324,6 +324,7 @@ class WeiboSpider:
         :return: 无返回值
         """
         user_count = 0
+        uid_list = []
         re_comp = re.compile(
             r'''<div style="padding: 6px 0 3px;">.*?weibo.com/(?P<uid>\d+)\?.*?nick-name="(?P<username>.*?)".*?</div>''',
             re.S)
@@ -337,10 +338,15 @@ class WeiboSpider:
                     for i in iter_:
                         if user_count >= count:
                             break
+
                         uid = i.group("uid")
                         username = i.group("username")
+
+                        if uid in uid_list:
+                            continue
                         f.write(uid + ',' + username)
                         f.write('\n')
+                        uid_list.append(uid)
                         user_count += 1
                         bar.update(1)
 
