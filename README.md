@@ -35,6 +35,8 @@
 - `db_name`
 - `charset`
 
+`download_pic`: 是否下载图片
+
 ### 使用方法
 
 1. `pip install -r requirement.txt`

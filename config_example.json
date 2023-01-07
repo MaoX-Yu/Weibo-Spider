@@ -16,5 +16,6 @@
     "port": 3306,
     "db_name": "weibo",
     "charset": "utf8mb4"
-  }
+  },
+  "download_pic": false
 }

@@ -59,6 +59,7 @@ class WeiboSpider:
             self.user_num = self.config['user_num']
             self.blog_num = self.config['blog_num']
             self.sleep_time_range = self.config['sleep_time']
+            self.is_download_pic = self.config['download_pic']
         except Exception:
             self.logger.error('配置文件有误，错误信息：{0}'.format(traceback.format_exc(limit=1)))
             exit(1)
@@ -282,7 +283,10 @@ class WeiboSpider:
                         self.db_insert('blog', blog_msg)
 
                         for index, pic in enumerate(pic_list):
-                            if self.db_insert('picture', [pic, blog_list[i]['idstr']]):
+                            pic_values = [pic, blog_list[i]['idstr'],
+                                          'https://weibo.com/ajax/common/download?pid=' + pic]
+
+                            if self.db_insert('picture', pic_values) and self.is_download_pic:
                                 self.download_pic(pic)
 
                             if (index + 1) % 3 == 0:
