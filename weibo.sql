@@ -63,6 +63,7 @@ DROP TABLE IF EXISTS `picture`;
 CREATE TABLE `picture` (
   `p_id` varchar(100) CHARACTER SET utf8 NOT NULL,
   `b_id` varchar(20) CHARACTER SET utf8 NOT NULL,
+  `p_url` varchar(200) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`p_id`),
   KEY `picture_FK` (`b_id`),
   CONSTRAINT `picture_FK` FOREIGN KEY (`b_id`) REFERENCES `blog` (`b_id`)
