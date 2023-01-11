@@ -2,7 +2,7 @@
 # @Author: MaoX-Yu
 # @Time: 2022/9/28 16:32
 # @Desc: 微博爬虫
-# @Update: 2023/1/5 23:30
+# @Update: 2023/1/11 16:00
 import re
 import json
 import random
@@ -154,7 +154,7 @@ class WeiboSpider:
 
         :param uid: 用户uid
         :param uname: 用户名
-        :return: 无返回值
+        :return: bool
         """
         details = [str(uid), uname]
         url_info = 'https://weibo.com/ajax/profile/info'
@@ -170,11 +170,11 @@ class WeiboSpider:
             resp.close()
         except Exception:
             self.logger.error(traceback.format_exc(limit=1))
-            return
+            return False
 
         if info['verified'] and 0 < info['verified_type'] < 200:  # 判断是否为官方号
             self.logger.info('用户ID:{0} 用户名:{1} 不符合条件'.format(uid, uname))
-            return
+            return False
 
         for item in ['followers_count', 'location']:
             if item in info:
@@ -200,7 +200,7 @@ class WeiboSpider:
                 details.append('')
 
         # self.logger.info(details)
-        self.db_insert('user', details)
+        return self.db_insert('user', details)
 
     def get_blogs(self, uid, count):
         """ 获取用户的历史博文
@@ -408,10 +408,12 @@ class WeiboSpider:
             return False
 
         for i in range(id_df.shape[0]):
+            if not self.select_uid('user', id_df.iloc[i]['uid']):
+                if not self.get_details(id_df.iloc[i]['uid'], id_df.iloc[i]['username']):
+                    self.logger.info('skip,uid:{0}'.format(id_df.iloc[i]['uid']))
+                    continue
+
             if self.select_uid('blog', id_df.iloc[i]['uid']):
-                self.logger.info('skip,uid:{0}'.format(id_df.iloc[i]['uid']))
-                continue
-            elif not self.select_uid('user', id_df.iloc[i]['uid']):
                 self.logger.info('skip,uid:{0}'.format(id_df.iloc[i]['uid']))
                 continue
 
