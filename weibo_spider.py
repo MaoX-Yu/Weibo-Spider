@@ -2,7 +2,7 @@
 # @Author: MaoX-Yu
 # @Time: 2022/9/28 16:32
 # @Desc: 微博爬虫
-# @Update: 2023/1/11 16:00
+# @Update: 2023/1/13 10:20
 import re
 import json
 import random
@@ -320,22 +320,27 @@ class WeiboSpider:
         resp.close()
         return result
 
-    def get_uid(self, url, count):
-        """ 从话题中获取用户的uid和用户名
+    def get_user(self, url, count):
+        """ 从话题中获取用户的信息和博文
 
         :param url: 话题url
         :param count: 获取用户数量
         :return: 无返回值
         """
         user_count = 0
+        start_count = 0
         uid_list = []
         re_comp = re.compile(
             r'''<div style="padding: 6px 0 3px;">.*?weibo.com/(?P<uid>\d+)\?.*?nick-name="(?P<username>.*?)".*?</div>''',
             re.S)
 
-        with tqdm(total=count, desc='正在获取用户ID') as bar:
+        with tqdm(total=count, desc='正在获取用户') as bar:
             while user_count < count:
-                str_html = self.get_html(url)
+                try:
+                    str_html = self.get_html(url)
+                except Exception:
+                    self.logger.error(traceback.format_exc(limit=1))
+                    return
                 iter_ = re_comp.finditer(str_html)
 
                 with open("uid.csv", mode="a", encoding="utf-8") as f:
@@ -352,8 +357,15 @@ class WeiboSpider:
                         f.write('\n')
                         uid_list.append(uid)
                         user_count += 1
-                        bar.update(1)
 
+                id_df = pandas.read_csv('uid.csv', names=['uid', 'username'])
+                for i in range(start_count, user_count):
+                    self.get_details(id_df.iloc[i]['uid'], id_df.iloc[i]['username'])
+                    bar.update(1)
+
+                    self.get_blogs(id_df.iloc[i]['uid'], self.blog_num)
+
+                start_count = user_count
                 url = next_page(url)
                 self.sleep_time()
 
@@ -456,28 +468,10 @@ class WeiboSpider:
             search_key = input("请输入话题关键词：")
             url_real = self.get_real_url(search_key)
 
-            print("------ 获取用户UID ------")
+            print("------ 开始爬取 ------")
             print("共获取{0}位用户".format(self.user_num))
             sleep(0.5)
-            self.get_uid(url_real, self.user_num)
-            sleep(0.5)
-
-            print("------ 获取用户详细信息 ------")
-            sleep(0.5)
-            id_df = pandas.read_csv('uid.csv', names=['uid', 'username'])
-            for i in tqdm(range(self.user_num)):
-                self.get_details(id_df.iloc[i]['uid'], id_df.iloc[i]['username'])
-                if (i + 1) % 5 == 0:  # 每爬取一定个数的信息后进行休眠
-                    self.sleep_time()
-            sleep(0.5)
-
-            print("------ 获取用户历史推文 ------")
-            print("每位用户获取{0}条博文".format(self.blog_num))
-            sleep(0.5)
-            for i in range(self.user_num):
-                self.get_blogs(id_df.iloc[i]['uid'], self.blog_num)
-                if (i + 1) % 5 == 0:  # 每爬取一定个数的信息后进行休眠
-                    self.sleep_time()
+            self.get_user(url_real, self.user_num)
         except Exception:
             self.logger.error(traceback.format_exc(limit=1))
         finally:
