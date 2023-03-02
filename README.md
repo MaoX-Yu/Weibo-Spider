@@ -1,44 +1,31 @@
-# 微博爬虫
+# Weibo crawler
 
-> 环境: Python3.10
 
+
+>Environment: Python 3.7
 ---
 
-### 功能
+### Function
 
-爬取在某一话题中发布过内容的用户的个人信息和历史博文
 
-### 配置说明
 
-> 配置文件: `config.json`
+Crawl the personal information and historical blog posts of users who have published content on a topic
 
-`headers`: 请求头
 
-- `User-Agent`
-- `cookie`
 
-`user_num`: 需要获取的用户数量
+### Document description
 
-`blog_num`: 每位用户获取的博文数量
+The function of the first.py file is to crawl users in a topic, and whether 
+they are depressed users, and save them in the Weibo list file
 
-`sleep_time`: 休眠时间
 
-- `min`
-- `max`
 
-`mysql`: mysql数据库配置
+The second.py file is used to enter the user's details page and crawl the
+user's personal information, such as the number of users' followers and fans,
+Number of tweets, gender, user profile and tag, then save them to the 
+result.csv file, and crawl the user's tweet information Save it in the
+result file, and finally clean the file
 
-- `host`
-- `user`
-- `password`
-- `port`
-- `db_name`
-- `charset`
 
-`download_pic`: 是否下载图片
 
-### 使用方法
-
-1. `pip install -r requirement.txt`
-2. 重命名文件`config_example.json`为`config.json`
-3. 运行`weibo_spider.py`
+The last.py file is used to write the file to the database and save it
